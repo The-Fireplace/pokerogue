@@ -19,6 +19,7 @@ import { AbilityAttr } from "#enums/ability-attr";
 import { AbilityId } from "#enums/ability-id";
 import { BiomeId } from "#enums/biome-id";
 import { Button } from "#enums/buttons";
+import { CandyUpgradeDisplay } from "#enums/candy-upgrade-display";
 import { CandyUpgradeNotification } from "#enums/candy-upgrade-notification";
 import { DexAttr } from "#enums/dex-attr";
 import { DropDownColumn } from "#enums/drop-down-column";
@@ -892,7 +893,8 @@ export class PokedexUiHandler extends MessageUiHandler {
    */
   isUpgradeIconEnabled(): boolean {
     return (
-      globalScene.candyUpgradeNotification !== CandyUpgradeNotification.OFF && globalScene.candyUpgradeDisplay === 0
+      globalScene.candyUpgradeNotification !== CandyUpgradeNotification.OFF
+      && globalScene.candyUpgradeDisplay === CandyUpgradeDisplay.ICON
     );
   }
   /**
@@ -901,7 +903,8 @@ export class PokedexUiHandler extends MessageUiHandler {
    */
   isUpgradeAnimationEnabled(): boolean {
     return (
-      globalScene.candyUpgradeNotification !== CandyUpgradeNotification.OFF && globalScene.candyUpgradeDisplay === 1
+      globalScene.candyUpgradeNotification !== CandyUpgradeNotification.OFF
+      && globalScene.candyUpgradeDisplay === CandyUpgradeDisplay.ANIMATION
     );
   }
 
@@ -968,7 +971,10 @@ export class PokedexUiHandler extends MessageUiHandler {
   setUpgradeAnimation(icon: Phaser.GameObjects.Sprite, species: PokemonSpecies, startPaused = false): void {
     globalScene.tweens.killTweensOf(icon);
     // Skip animations if they are disabled
-    if (globalScene.candyUpgradeDisplay === 0 || species.speciesId !== species.getRootSpeciesId(false)) {
+    if (
+      globalScene.candyUpgradeDisplay === CandyUpgradeDisplay.ICON
+      || species.speciesId !== species.getRootSpeciesId(false)
+    ) {
       return;
     }
 
@@ -1954,7 +1960,7 @@ export class PokedexUiHandler extends MessageUiHandler {
           container.favoriteIcon.setVisible(this.starterPreferences[speciesId]?.favorite ?? false);
 
           // 'Candy Icon' mode
-          if (globalScene.candyUpgradeDisplay === 0) {
+          if (globalScene.candyUpgradeDisplay === CandyUpgradeDisplay.ICON) {
             if (!starterColors[this.getStarterSpeciesId(speciesId)]) {
               // Default to white if no colors are found
               starterColors[this.getStarterSpeciesId(speciesId)] = ["ffffff", "ffffff"];
@@ -1967,7 +1973,7 @@ export class PokedexUiHandler extends MessageUiHandler {
             container.candyUpgradeOverlayIcon.setTint(
               argbFromRgba(rgbHexToRgba(starterColors[this.getStarterSpeciesId(speciesId)][1])),
             );
-          } else if (globalScene.candyUpgradeDisplay === 1) {
+          } else if (globalScene.candyUpgradeDisplay === CandyUpgradeDisplay.ANIMATION) {
             container.candyUpgradeIcon.setVisible(false);
             container.candyUpgradeOverlayIcon.setVisible(false);
           }
