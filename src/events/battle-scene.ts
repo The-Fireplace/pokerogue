@@ -1,3 +1,4 @@
+import type { CandyUpgradeNotification } from "#enums/candy-upgrade-notification";
 import type { BerryModifier } from "#modifiers/modifier";
 import type { Move } from "#moves/move";
 
@@ -46,8 +47,8 @@ export enum BattleSceneEventType {
 /** Container class for {@linkcode BattleSceneEventType.CANDY_UPGRADE_NOTIFICATION_CHANGED} events */
 export class CandyUpgradeNotificationChangedEvent extends Event {
   /** The new value the setting was changed to */
-  public newValue: number;
-  constructor(newValue: number) {
+  public newValue: CandyUpgradeNotification;
+  constructor(newValue: CandyUpgradeNotification) {
     super(BattleSceneEventType.CANDY_UPGRADE_NOTIFICATION_CHANGED);
 
     this.newValue = newValue;

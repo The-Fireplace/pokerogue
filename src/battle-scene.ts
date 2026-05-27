@@ -42,6 +42,7 @@ import { BattleStyle } from "#enums/battle-style";
 import { BattleType } from "#enums/battle-type";
 import { BattlerTagType } from "#enums/battler-tag-type";
 import { BiomeId } from "#enums/biome-id";
+import { CandyUpgradeNotification } from "#enums/candy-upgrade-notification";
 import { EaseType } from "#enums/ease-type";
 import { ExpGainsSpeed } from "#enums/exp-gains-speed";
 import { ExpNotification } from "#enums/exp-notification";
@@ -202,12 +203,9 @@ export class BattleScene extends SceneBase {
   public hideMoveSkipConfirm = false;
   // TODO: Remove all plain numbers in place of enums or `const object` equivalents for clarity
   /**
-   * Determines the condition for a notification should be shown for Candy Upgrades
-   * - 0 = 'Off'
-   * - 1 = 'Passives Only'
-   * - 2 = 'On'
+   * Determines when a notification should be shown for Candy Upgrades.
    */
-  public candyUpgradeNotification = 0;
+  public candyUpgradeNotification: CandyUpgradeNotification = CandyUpgradeNotification.OFF;
   /**
    * Determines what type of notification is used for Candy Upgrades
    * - 0 = 'Icon'

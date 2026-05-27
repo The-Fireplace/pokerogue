@@ -19,6 +19,7 @@ import { AbilityAttr } from "#enums/ability-attr";
 import { AbilityId } from "#enums/ability-id";
 import { BiomeId } from "#enums/biome-id";
 import { Button } from "#enums/buttons";
+import { CandyUpgradeNotification } from "#enums/candy-upgrade-notification";
 import { DexAttr } from "#enums/dex-attr";
 import { DropDownColumn } from "#enums/drop-down-column";
 import type { Nature } from "#enums/nature";
@@ -890,14 +891,18 @@ export class PokedexUiHandler extends MessageUiHandler {
    * @returns true if upgrade notifications are enabled and set to display an 'Icon'
    */
   isUpgradeIconEnabled(): boolean {
-    return globalScene.candyUpgradeNotification !== 0 && globalScene.candyUpgradeDisplay === 0;
+    return (
+      globalScene.candyUpgradeNotification !== CandyUpgradeNotification.OFF && globalScene.candyUpgradeDisplay === 0
+    );
   }
   /**
    * Determines if 'Animation' based upgrade notifications should be shown
    * @returns true if upgrade notifications are enabled and set to display an 'Animation'
    */
   isUpgradeAnimationEnabled(): boolean {
-    return globalScene.candyUpgradeNotification !== 0 && globalScene.candyUpgradeDisplay === 1;
+    return (
+      globalScene.candyUpgradeNotification !== CandyUpgradeNotification.OFF && globalScene.candyUpgradeDisplay === 1
+    );
   }
 
   getStarterSpeciesId(speciesId: SpeciesId): SpeciesId {
@@ -996,7 +1001,7 @@ export class PokedexUiHandler extends MessageUiHandler {
 
     if (
       this.isPassiveAvailable(species.speciesId)
-      || (globalScene.candyUpgradeNotification === 2
+      || (globalScene.candyUpgradeNotification === CandyUpgradeNotification.ON
         && (this.isValueReductionAvailable(species.speciesId) || this.isSameSpeciesEggAvailable(species.speciesId)))
     ) {
       const chain = globalScene.tweens.chain(tweenChain);
@@ -1015,7 +1020,7 @@ export class PokedexUiHandler extends MessageUiHandler {
 
     if (
       !species
-      || globalScene.candyUpgradeNotification === 0
+      || globalScene.candyUpgradeNotification === CandyUpgradeNotification.OFF
       || species.speciesId !== species.getRootSpeciesId(false)
     ) {
       starter.candyUpgradeIcon.setVisible(false);
@@ -1027,13 +1032,10 @@ export class PokedexUiHandler extends MessageUiHandler {
     const isValueReductionAvailable = this.isValueReductionAvailable(species.speciesId);
     const isSameSpeciesEggAvailable = this.isSameSpeciesEggAvailable(species.speciesId);
 
-    // 'Passive Only' mode
-    if (globalScene.candyUpgradeNotification === 1) {
+    if (globalScene.candyUpgradeNotification === CandyUpgradeNotification.PASSIVES_ONLY) {
       starter.candyUpgradeIcon.setVisible(slotVisible && isPassiveAvailable);
       starter.candyUpgradeOverlayIcon.setVisible(slotVisible && starter.candyUpgradeIcon.visible);
-
-      // 'On' mode
-    } else if (globalScene.candyUpgradeNotification === 2) {
+    } else if (globalScene.candyUpgradeNotification === CandyUpgradeNotification.ON) {
       starter.candyUpgradeIcon.setVisible(
         slotVisible && (isPassiveAvailable || isValueReductionAvailable || isSameSpeciesEggAvailable),
       );
