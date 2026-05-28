@@ -1458,6 +1458,25 @@ export class StarterSelectUiHandler extends MessageUiHandler {
   }
 
   /**
+   * Determines if an upgrade notification is available for the given species ID
+   * @param speciesId The ID of the species to check the upgrade notification of
+   * @returns true if an upgrade notification is available for the given species ID
+   */
+  isCandyUpgradeNotificationAvailable(speciesId: SpeciesId): boolean {
+    const isPassiveAvailable = this.isPassiveAvailable(speciesId);
+    const isValueReductionAvailable = this.isValueReductionAvailable(speciesId);
+    const isSameSpeciesEggAvailable = this.isSameSpeciesEggAvailable(speciesId);
+    switch (globalScene.candyUpgradeNotification) {
+      case CandyUpgradeNotification.OFF:
+        return false;
+      case CandyUpgradeNotification.PASSIVES_ONLY:
+        return isPassiveAvailable;
+      case CandyUpgradeNotification.ON:
+        return isPassiveAvailable || isValueReductionAvailable || isSameSpeciesEggAvailable;
+    }
+  }
+
+  /**
    * Determines if a passive upgrade is available for the given species ID
    * @param speciesId The ID of the species to check the passive of
    * @returns true if the user has enough candies and a passive has not been unlocked already
@@ -1470,8 +1489,20 @@ export class StarterSelectUiHandler extends MessageUiHandler {
     return (
       starterCost != null
       && starterData.candyCount >= getPassiveCandyCount(starterCost)
-      && !(starterData.passiveAttr & PassiveAttr.UNLOCKED)
+      && !this.isPassiveUnlocked(speciesId)
     );
+  }
+
+  /**
+   * Determines if the passive upgrade has been unlocked already for the given species ID
+   * @param speciesId The ID of the species to check the passive of
+   * @returns true if the passive has been unlocked, false otherwise
+   */
+  isPassiveUnlocked(speciesId: SpeciesId): boolean {
+    // Get this species ID's starter data
+    const starterData = globalScene.gameData.starterData[speciesId];
+
+    return !!(starterData.passiveAttr & PassiveAttr.UNLOCKED);
   }
 
   /**
@@ -1547,11 +1578,7 @@ export class StarterSelectUiHandler extends MessageUiHandler {
       ],
     };
 
-    if (
-      this.isPassiveAvailable(species.speciesId)
-      || (globalScene.candyUpgradeNotification === CandyUpgradeNotification.ON
-        && (this.isValueReductionAvailable(species.speciesId) || this.isSameSpeciesEggAvailable(species.speciesId)))
-    ) {
+    if (this.isCandyUpgradeNotificationAvailable(species.speciesId)) {
       const chain = globalScene.tweens.chain(tweenChain);
       if (!startPaused) {
         chain.play();
@@ -1576,19 +1603,10 @@ export class StarterSelectUiHandler extends MessageUiHandler {
       return;
     }
 
-    const isPassiveAvailable = this.isPassiveAvailable(species.speciesId);
-    const isValueReductionAvailable = this.isValueReductionAvailable(species.speciesId);
-    const isSameSpeciesEggAvailable = this.isSameSpeciesEggAvailable(species.speciesId);
+    const isNotificationAvailable = this.isCandyUpgradeNotificationAvailable(species.speciesId);
 
-    if (globalScene.candyUpgradeNotification === CandyUpgradeNotification.PASSIVES_ONLY) {
-      starter.candyUpgradeIcon.setVisible(slotVisible && isPassiveAvailable);
-      starter.candyUpgradeOverlayIcon.setVisible(slotVisible && starter.candyUpgradeIcon.visible);
-    } else if (globalScene.candyUpgradeNotification === CandyUpgradeNotification.ON) {
-      starter.candyUpgradeIcon.setVisible(
-        slotVisible && (isPassiveAvailable || isValueReductionAvailable || isSameSpeciesEggAvailable),
-      );
-      starter.candyUpgradeOverlayIcon.setVisible(slotVisible && starter.candyUpgradeIcon.visible);
-    }
+    starter.candyUpgradeIcon.setVisible(slotVisible && isNotificationAvailable);
+    starter.candyUpgradeOverlayIcon.setVisible(slotVisible && starter.candyUpgradeIcon.visible);
   }
 
   /**
