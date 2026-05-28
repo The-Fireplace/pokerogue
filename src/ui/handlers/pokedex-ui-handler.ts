@@ -925,12 +925,13 @@ export class PokedexUiHandler extends MessageUiHandler {
     const isValueReductionAvailable = this.isValueReductionAvailable(speciesId);
     const isSameSpeciesEggAvailable = this.isSameSpeciesEggAvailable(speciesId);
     switch (globalScene.candyUpgradeNotification) {
-      case CandyUpgradeNotification.OFF:
-        return false;
       case CandyUpgradeNotification.PASSIVES_ONLY:
         return isPassiveAvailable;
       case CandyUpgradeNotification.ON:
         return isPassiveAvailable || isValueReductionAvailable || isSameSpeciesEggAvailable;
+      case CandyUpgradeNotification.OFF:
+      default:
+        return false;
     }
   }
 
